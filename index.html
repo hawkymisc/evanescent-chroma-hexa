@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六角形さめがめ - Anescent Chroma Hexa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>六角形さめがめ</h1>
+        </header>
+
+        <div class="game-info">
+            <div class="score-display">
+                スコア: <span id="score">0</span>
+            </div>
+        </div>
+
+        <div id="game-board" class="game-board">
+            <!-- 六角形グリッドがここに生成される -->
+        </div>
+
+        <div class="controls">
+            <button id="new-game-btn" class="btn">新規ゲーム</button>
+        </div>
+
+        <div id="game-over-overlay" class="game-over-overlay hidden">
+            <div class="game-over-message">
+                <h2>ゲーム終了</h2>
+                <p>最終スコア: <span id="final-score">0</span></p>
+                <button id="restart-btn" class="btn">もう一度プレイ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
