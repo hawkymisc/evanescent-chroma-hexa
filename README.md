@@ -90,12 +90,30 @@ python -m http.server 8000
 # Open http://localhost:8000/test.html in browser
 ```
 
+**Method 3: Monkey Tests (Stress Testing)**
+```bash
+# Basic monkey test - Random operations
+node monkey-test.js
+
+# Advanced monkey test - Hexagonal grid validation
+node advanced-monkey-test.js
+
+# Fuzz test - Edge cases and invalid inputs
+node fuzz-test.js
+
+# Logic bug test - Game logic verification
+node logic-bug-test.js
+```
+
 #### Test Coverage
 
 - ✅ **Boundary Value Analysis**: Coordinates, group sizes, score boundaries
 - ✅ **State Transition Testing**: Game state and tile state transitions
 - ✅ **Unit Tests**: Individual tests for all functions
 - ✅ **Integration Tests**: Full game flow testing
+- ✅ **Monkey Tests**: Random operations, stress testing, edge cases (hundreds of test cases)
+- ✅ **Fuzz Tests**: Invalid inputs, extreme values, malformed data
+- ✅ **Logic Verification**: Gravity physics, score accuracy, game over detection
 
 #### Test Suite Details
 
@@ -222,12 +240,30 @@ python -m http.server 8000
 # ブラウザで http://localhost:8000/test.html を開く
 ```
 
+**方法3: モンキーテスト（ストレステスト）**
+```bash
+# 基本モンキーテスト - ランダム操作
+node monkey-test.js
+
+# 高度なモンキーテスト - 六角形グリッドの検証
+node advanced-monkey-test.js
+
+# ファズテスト - エッジケースと無効な入力
+node fuzz-test.js
+
+# ロジックバグテスト - ゲームロジックの検証
+node logic-bug-test.js
+```
+
 #### テストカバレッジ
 
 - ✅ **境界値分析**: 座標、グループサイズ、スコアの境界値
 - ✅ **状態遷移テスト**: ゲーム状態、タイル状態の遷移
 - ✅ **ユニットテスト**: 全関数の個別テスト
 - ✅ **統合テスト**: ゲームフロー全体のテスト
+- ✅ **モンキーテスト**: ランダム操作、ストレステスト、エッジケース（数百のテストケース）
+- ✅ **ファズテスト**: 無効な入力、極端な値、不正なデータ
+- ✅ **ロジック検証**: 重力物理演算、スコア正確性、ゲームオーバー判定
 
 #### テストスイート詳細
 
