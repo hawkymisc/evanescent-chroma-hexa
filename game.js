@@ -20,18 +20,17 @@ function hexToPixel(q, r) {
     const hexWidth = 60;   // 横幅
     const hexHeight = 70;  // 高さ
 
-    // 六角形の頂点（中心基準）：
-    // 上: (0, -35), 右上: (30, -17.5), 右下: (30, 17.5)
-    // 下: (0, 35), 左下: (-30, 17.5), 左上: (-30, -17.5)
+    // 六角形の一辺の長さ（右の垂直辺の長さ）
+    const edgeLength = 35; // (52.5 - 17.5) = 35px
 
-    // 隣接六角形が辺で接触するための中心間距離：
-    // 東方向 (dq=+1, dr=0): x方向に +60
-    // 南方向 (dq=0, dr=+1): y方向に +35
-    // 北東方向 (dq=+1, dr=-1): (+60, -35)
+    // Pointy-top六角形の標準的なAxial座標変換式
+    // size（外接円の半径）≈ 35px
+    const size = edgeLength;
 
-    // Axial座標系の変換式
-    const x = hexWidth * q;
-    const y = (hexHeight / 2) * (r - q);
+    // 横方向: size * √3 * q + size * √3/2 * r
+    // 縦方向: size * 3/2 * r
+    const x = size * Math.sqrt(3) * q + size * Math.sqrt(3) / 2 * r;
+    const y = size * 1.5 * r;
 
     return { x, y };
 }
