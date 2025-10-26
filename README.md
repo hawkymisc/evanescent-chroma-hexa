@@ -67,6 +67,16 @@ npx serve
 
 ### テスト実行方法
 
+**方法1: Node.js（推奨）**
+```bash
+# テストを実行（131個のテストケース）
+npm test
+
+# または直接実行
+node test-node.js
+```
+
+**方法2: ブラウザ（Mocha UI）**
 ```bash
 # HTTPサーバーを起動
 python -m http.server 8000
