@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "六角形グリッドで遊ぶ、色合わせパズルゲーム。",
   "main": "game.js",
+  "homepage": "https://hawkymisc.github.io/anescent-chroma-hexa/",
   "scripts": {
     "test": "node test-node.js"
   },
   "repository": {
     "type": "git",
-    "url": "http://local_proxy@127.0.0.1:43947/git/hawkymisc/anescent-chroma-hexa"
+    "url": "https://github.com/hawkymisc/anescent-chroma-hexa.git"
   },
   "keywords": [],
   "author": "",
