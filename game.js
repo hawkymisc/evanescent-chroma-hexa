@@ -17,8 +17,15 @@ let gameState = {
 
 // Axial座標からピクセル座標への変換（Pointy-top方式）
 function hexToPixel(q, r) {
-    const x = HEX_SIZE * (3/2 * q);
-    const y = HEX_SIZE * (Math.sqrt(3)/2 * q + Math.sqrt(3) * r);
+    // CSS で定義された六角形の実際の寸法を使用
+    const hexWidth = 60;
+    const hexHeight = 70;
+
+    // Pointy-top 六角形の配置計算
+    // 横方向: 各列は幅の 3/4 ずつずれる
+    // 縦方向: 各行は高さ分ずれ、列番号に応じて半行分オフセット
+    const x = hexWidth * 0.75 * q;
+    const y = hexHeight * (r + 0.5 * q);
     return { x, y };
 }
 
