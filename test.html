@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evanescent Chroma Hexa - テスト</title>
+
+    <!-- Mocha CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #mocha {
+            margin-top: 20px;
+        }
+        .test-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>Evanescent Chroma Hexa - ユニットテスト</h1>
+        <p>テスト設計書に基づいた包括的なテスト</p>
+    </div>
+
+    <!-- Mocha テスト結果表示エリア -->
+    <div id="mocha"></div>
+
+    <!-- Mocha -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/10.2.0/mocha.min.js"></script>
+    <!-- Chai -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.3.10/chai.min.js"></script>
+
+    <script>
+        // Mochaセットアップ
+        mocha.setup('bdd');
+        const expect = chai.expect;
+
+        // ゲームロジックを読み込む前にテスト用のグローバル変数を設定
+        // DOM要素のモック
+        const mockDOM = {
+            elements: {},
+            getElementById: function(id) {
+                if (!this.elements[id]) {
+                    this.elements[id] = {
+                        textContent: '',
+                        innerHTML: '',
+                        classList: {
+                            classes: new Set(),
+                            add: function(cls) { this.classes.add(cls); },
+                            remove: function(cls) { this.classes.delete(cls); },
+                            contains: function(cls) { return this.classes.has(cls); }
+                        },
+                        dataset: {},
+                        style: {},
+                        addEventListener: function() {}
+                    };
+                }
+                return this.elements[id];
+            }
+        };
+    </script>
+
+    <!-- ゲームロジックを読み込み（DOM操作を除く） -->
+    <script src="game.js"></script>
+
+    <!-- テストスイート -->
+    <script src="test.js"></script>
+
+    <script>
+        // テスト実行
+        mocha.run();
+    </script>
+</body>
+</html>
