@@ -1,9 +1,9 @@
-# Anescent Chroma Hexa 仕様書
+# Evanescent Chroma Hexa 仕様書
 
 ## 1. プロジェクト概要
 
 ### 1.1 プロジェクト名
-**Anescent Chroma Hexa** - 六角形グリッドベースの色合わせパズルゲーム
+**Evanescent Chroma Hexa** - 六角形グリッドベースの色合わせパズルゲーム
 
 ### 1.2 目的
 - GitHub Pagesで無料でプレイ可能
@@ -113,7 +113,7 @@
 
 ```
 +----------------------------------+
-|    Anescent Chroma Hexa          |
+|    Evanescent Chroma Hexa        |
 +----------------------------------+
 | スコア: 1234    残り手: ?         |
 +----------------------------------+

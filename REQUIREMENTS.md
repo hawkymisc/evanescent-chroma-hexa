@@ -1,4 +1,4 @@
-# 要件定義書 - Anescent Chroma Hexa MVP
+# 要件定義書 - Evanescent Chroma Hexa MVP
 
 ## ユースケース駆動の要件抽出
 
@@ -172,7 +172,7 @@
 
 ```
 +----------------------------------+
-|   Anescent Chroma Hexa           |
+|   Evanescent Chroma Hexa         |
 +----------------------------------+
 | スコア: 123                       |
 +----------------------------------+

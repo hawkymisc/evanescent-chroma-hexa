@@ -1,4 +1,4 @@
-# Anescent Chroma Hexa
+# Evanescent Chroma Hexa
 
 六角形グリッドで遊ぶ、色合わせパズルゲーム。
 
