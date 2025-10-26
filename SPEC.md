@@ -1,9 +1,9 @@
-# 六角形さめがめ (Hexagonal Samegame) 仕様書
+# Anescent Chroma Hexa 仕様書
 
 ## 1. プロジェクト概要
 
 ### 1.1 プロジェクト名
-**Anescent Chroma Hexa** - 六角形グリッドベースのさめがめパズルゲーム
+**Anescent Chroma Hexa** - 六角形グリッドベースの色合わせパズルゲーム
 
 ### 1.2 目的
 - GitHub Pagesで無料でプレイ可能
@@ -113,7 +113,7 @@
 
 ```
 +----------------------------------+
-|         六角形さめがめ            |
+|    Anescent Chroma Hexa          |
 +----------------------------------+
 | スコア: 1234    残り手: ?         |
 +----------------------------------+
@@ -348,9 +348,6 @@ function hexToPixel(q, r, size) {
 
 ### 六角形グリッド
 - [Red Blob Games - Hexagonal Grids](https://www.redblobgames.com/grids/hexagons/)
-
-### さめがめ
-- Wikipedia: [SameGame](https://ja.wikipedia.org/wiki/さめがめ)
 
 ---
 
