@@ -22,10 +22,10 @@ function hexToPixel(q, r) {
     const hexHeight = 70;
 
     // Pointy-top 六角形の配置計算
-    // 横方向: 各列は幅の 3/4 ずつずれる
-    // 縦方向: 各行は高さ分ずれ、列番号に応じて半行分オフセット
+    // 横方向: 各列は幅の 3/4 ずつずれる（重なりを作る）
+    // 縦方向: 各行は高さの 3/4 ずつずれる（重なりを作る）、列番号に応じて半行分オフセット
     const x = hexWidth * 0.75 * q;
-    const y = hexHeight * (r + 0.5 * q);
+    const y = hexHeight * 0.75 * (r + 0.5 * q);
     return { x, y };
 }
 
