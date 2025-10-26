@@ -16,17 +16,22 @@ let gameState = {
 
 // Axial座標からピクセル座標への変換（Pointy-top方式）
 function hexToPixel(q, r) {
-    // CSS六角形の高さ（上下の頂点間の距離）
-    const hexHeight = 70;
+    // CSS六角形の寸法
+    const hexWidth = 60;   // 横幅
+    const hexHeight = 70;  // 高さ
 
-    // Pointy-top正六角形の一辺の長さ = 高さ / 2
-    const size = hexHeight / 2; // = 35
+    // 六角形の頂点（中心基準）：
+    // 上: (0, -35), 右上: (30, -17.5), 右下: (30, 17.5)
+    // 下: (0, 35), 左下: (-30, 17.5), 左上: (-30, -17.5)
 
-    // 標準的なAxial座標系の変換式
-    // 横方向の中心間距離: size * 1.5
-    // 縦方向の中心間距離: size * √3
-    const x = size * 1.5 * q;
-    const y = size * Math.sqrt(3) * (r + 0.5 * q);
+    // 隣接六角形が辺で接触するための中心間距離：
+    // 東方向 (dq=+1, dr=0): x方向に +60
+    // 南方向 (dq=0, dr=+1): y方向に +35
+    // 北東方向 (dq=+1, dr=-1): (+60, -35)
+
+    // Axial座標系の変換式
+    const x = hexWidth * q;
+    const y = (hexHeight / 2) * (r - q);
 
     return { x, y };
 }
