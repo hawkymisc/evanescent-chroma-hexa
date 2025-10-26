@@ -4,7 +4,6 @@
 const GRID_COLS = 8;
 const GRID_ROWS = 9;
 const NUM_COLORS = 4;
-const HEX_SIZE = 30; // 六角形の半径
 
 // ===== ゲーム状態 =====
 let gameState = {
@@ -17,15 +16,18 @@ let gameState = {
 
 // Axial座標からピクセル座標への変換（Pointy-top方式）
 function hexToPixel(q, r) {
-    // CSS で定義された六角形の実際の寸法を使用
-    const hexWidth = 60;
+    // CSS六角形の高さ（上下の頂点間の距離）
     const hexHeight = 70;
 
-    // Pointy-top 六角形の配置計算
-    // 横方向: 各列は幅の 3/4 ずつずれる（重なりを作る）
-    // 縦方向: 各行は高さの 3/4 ずつずれる（重なりを作る）、列番号に応じて半行分オフセット
-    const x = hexWidth * 0.75 * q;
-    const y = hexHeight * 0.75 * (r + 0.5 * q);
+    // Pointy-top正六角形の一辺の長さ = 高さ / 2
+    const size = hexHeight / 2; // = 35
+
+    // 標準的なAxial座標系の変換式
+    // 横方向の中心間距離: size * 1.5
+    // 縦方向の中心間距離: size * √3
+    const x = size * 1.5 * q;
+    const y = size * Math.sqrt(3) * (r + 0.5 * q);
+
     return { x, y };
 }
 
