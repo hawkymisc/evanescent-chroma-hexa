@@ -132,31 +132,31 @@ h1 {
     pointer-events: none;
 }
 
-/* 速度設定: ちょっぱや */
+/* 速度設定: ちょっぱや（合計0.1秒） */
 .game-board.speed-super-fast .hex-tile.animating {
-    transition: left 0.2s ease-out, top 0.2s ease-out;
+    transition: left 0.06s ease-out, top 0.06s ease-out;
 }
 
 .game-board.speed-super-fast .hex-tile.removing {
-    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+    transition: opacity 0.04s ease-out, transform 0.04s ease-out;
 }
 
-/* 速度設定: 早い */
+/* 速度設定: 早い（合計0.3秒） */
 .game-board.speed-fast .hex-tile.animating {
-    transition: left 0.3s ease-out, top 0.3s ease-out;
+    transition: left 0.18s ease-out, top 0.18s ease-out;
 }
 
 .game-board.speed-fast .hex-tile.removing {
-    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    transition: opacity 0.12s ease-out, transform 0.12s ease-out;
 }
 
-/* 速度設定: ふつう */
+/* 速度設定: ふつう（合計0.5秒） */
 .game-board.speed-normal .hex-tile.animating {
-    transition: left 0.4s ease-out, top 0.4s ease-out;
+    transition: left 0.3s ease-out, top 0.3s ease-out;
 }
 
 .game-board.speed-normal .hex-tile.removing {
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 
 /* 色 */
