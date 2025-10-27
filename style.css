@@ -59,7 +59,7 @@ h1 {
 /* 六角形タイル */
 .hex-tile {
     position: absolute;
-    width: 60px;
+    width: 60.62px;
     height: 70px;
     clip-path: polygon(
         50% 0%,
