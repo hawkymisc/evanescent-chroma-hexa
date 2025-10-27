@@ -37,12 +37,48 @@ h1 {
 .game-info {
     text-align: center;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
 }
 
 .score-display {
     font-size: 1.5em;
     font-weight: bold;
     color: #333;
+}
+
+.speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1em;
+    color: #333;
+}
+
+.speed-control label {
+    font-weight: bold;
+}
+
+.speed-control select {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 6px;
+    font-size: 1em;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.speed-control select:hover {
+    border-color: #5568d3;
+}
+
+.speed-control select:focus {
+    outline: none;
+    border-color: #5568d3;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 /* ゲームボード */
@@ -70,11 +106,11 @@ h1 {
         0% 25%
     );
     cursor: pointer;
-    transition: transform 0.1s, filter 0.1s;
+    /* ホバー効果のみの高速トランジション */
+    transition: filter 0.1s;
 }
 
 .hex-tile:hover {
-    transform: scale(1.05);
     filter: brightness(1.1);
 }
 
@@ -82,6 +118,45 @@ h1 {
     filter: brightness(1.3);
     transform: scale(1.1);
     z-index: 10;
+}
+
+/* アニメーション用のトランジション設定 */
+.hex-tile.animating {
+    pointer-events: none; /* アニメーション中はクリック不可 */
+}
+
+/* 削除アニメーション */
+.hex-tile.removing {
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+/* 速度設定: ちょっぱや */
+.game-board.speed-super-fast .hex-tile.animating {
+    transition: left 0.2s ease-out, top 0.2s ease-out;
+}
+
+.game-board.speed-super-fast .hex-tile.removing {
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+
+/* 速度設定: 早い */
+.game-board.speed-fast .hex-tile.animating {
+    transition: left 0.3s ease-out, top 0.3s ease-out;
+}
+
+.game-board.speed-fast .hex-tile.removing {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+/* 速度設定: ふつう */
+.game-board.speed-normal .hex-tile.animating {
+    transition: left 0.4s ease-out, top 0.4s ease-out;
+}
+
+.game-board.speed-normal .hex-tile.removing {
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
 /* 色 */

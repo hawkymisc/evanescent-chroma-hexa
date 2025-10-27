@@ -5,11 +5,20 @@ const GRID_COLS = 8;
 const GRID_ROWS = 9;
 const NUM_COLORS = 4;
 
+// アニメーション速度設定（ミリ秒）
+const ANIMATION_SPEEDS = {
+    'super-fast': { remove: 150, slide: 200 },
+    'fast': { remove: 200, slide: 300 },
+    'normal': { remove: 300, slide: 400 }
+};
+
 // ===== ゲーム状態 =====
 let gameState = {
     tiles: new Map(), // key: "q,r", value: {q, r, color}
     score: 0,
-    gameOver: false
+    gameOver: false,
+    isAnimating: false, // アニメーション中かどうか
+    animationSpeed: 'normal' // デフォルトの速度
 };
 
 // ===== 六角形座標ユーティリティ =====
@@ -94,27 +103,69 @@ function initGrid() {
 
 // ===== レンダリング =====
 
-// グリッドを描画
+// タイルのDOM要素を作成
+function createTileElement(tile) {
+    const hexEl = document.createElement('div');
+    hexEl.className = `hex-tile color-${tile.color}`;
+    hexEl.dataset.q = tile.q;
+    hexEl.dataset.r = tile.r;
+
+    // 位置を計算（中央寄せのためオフセット追加）
+    const pos = hexToPixel(tile.q, tile.r);
+    hexEl.style.left = `${pos.x + 100}px`;
+    hexEl.style.top = `${pos.y + 50}px`;
+
+    // イベントリスナー
+    hexEl.addEventListener('click', () => handleTileClick(tile.q, tile.r));
+    hexEl.addEventListener('mouseenter', () => handleTileHover(tile.q, tile.r));
+    hexEl.addEventListener('mouseleave', clearHighlight);
+
+    return hexEl;
+}
+
+// グリッドを描画（差分更新版）
 function renderGrid() {
+    const board = document.getElementById('game-board');
+
+    // 既存のタイルをマップに保存
+    const existingTiles = new Map();
+    board.querySelectorAll('.hex-tile').forEach(el => {
+        const key = coordKey(Number(el.dataset.q), Number(el.dataset.r));
+        existingTiles.set(key, el);
+    });
+
+    // 新しいタイルを追加、既存のタイルは位置を更新
+    gameState.tiles.forEach(tile => {
+        const key = coordKey(tile.q, tile.r);
+        let hexEl = existingTiles.get(key);
+
+        if (!hexEl) {
+            // 新しいタイルを作成
+            hexEl = createTileElement(tile);
+            board.appendChild(hexEl);
+        } else {
+            // 既存のタイルの位置を更新（色が変わる可能性もあるが、このゲームでは変わらない）
+            const pos = hexToPixel(tile.q, tile.r);
+            hexEl.style.left = `${pos.x + 100}px`;
+            hexEl.style.top = `${pos.y + 50}px`;
+            // 使用済みとしてマークするため削除
+            existingTiles.delete(key);
+        }
+    });
+
+    // 使われなかったタイルを削除
+    existingTiles.forEach(el => {
+        el.remove();
+    });
+}
+
+// グリッドを完全に再描画（初期化時のみ使用）
+function renderGridFull() {
     const board = document.getElementById('game-board');
     board.innerHTML = '';
 
     gameState.tiles.forEach(tile => {
-        const hexEl = document.createElement('div');
-        hexEl.className = `hex-tile color-${tile.color}`;
-        hexEl.dataset.q = tile.q;
-        hexEl.dataset.r = tile.r;
-
-        // 位置を計算（中央寄せのためオフセット追加）
-        const pos = hexToPixel(tile.q, tile.r);
-        hexEl.style.left = `${pos.x + 100}px`;
-        hexEl.style.top = `${pos.y + 50}px`;
-
-        // イベントリスナー
-        hexEl.addEventListener('click', () => handleTileClick(tile.q, tile.r));
-        hexEl.addEventListener('mouseenter', () => handleTileHover(tile.q, tile.r));
-        hexEl.addEventListener('mouseleave', clearHighlight);
-
+        const hexEl = createTileElement(tile);
         board.appendChild(hexEl);
     });
 }
@@ -122,6 +173,104 @@ function renderGrid() {
 // スコアを更新
 function updateScore() {
     document.getElementById('score').textContent = gameState.score;
+}
+
+// ===== アニメーションユーティリティ =====
+
+// アニメーション速度を取得
+function getAnimationDurations() {
+    return ANIMATION_SPEEDS[gameState.animationSpeed];
+}
+
+// タイルの削除アニメーション
+function animateTileRemoval(tiles) {
+    const durations = getAnimationDurations();
+    const board = document.getElementById('game-board');
+
+    return new Promise(resolve => {
+        // 削除対象のタイルにアニメーションクラスを追加
+        tiles.forEach(tile => {
+            const el = board.querySelector(`[data-q="${tile.q}"][data-r="${tile.r}"]`);
+            if (el) {
+                el.classList.add('removing');
+            }
+        });
+
+        // アニメーション完了を待つ
+        setTimeout(() => {
+            // DOM から削除
+            tiles.forEach(tile => {
+                const el = board.querySelector(`[data-q="${tile.q}"][data-r="${tile.r}"]`);
+                if (el) {
+                    el.remove();
+                }
+            });
+            resolve();
+        }, durations.remove);
+    });
+}
+
+// タイルのスライドアニメーション
+function animateTileSlide() {
+    const durations = getAnimationDurations();
+    const board = document.getElementById('game-board');
+
+    return new Promise(resolve => {
+        // DOM要素を古い座標から新しい座標にマッピング
+        // 古い座標(DOM上のdata-q, data-r) → 新しい座標(gameState.tiles内のq, r)
+        const oldToNewMap = new Map();
+
+        // gameState.tiles内の各タイルについて、DOM上のどの要素に対応するかを探す
+        // 同じ色のタイルが同じ列(q)にある場合、上から順に対応付ける
+        for (let q = 0; q < GRID_COLS; q++) {
+            // 現在のDOM上の、この列のタイル（上から下）
+            const domTilesInColumn = [];
+            board.querySelectorAll(`.hex-tile[data-q="${q}"]`).forEach(el => {
+                domTilesInColumn.push({
+                    el: el,
+                    r: Number(el.dataset.r),
+                    color: Number(el.className.match(/color-(\d+)/)[1])
+                });
+            });
+            domTilesInColumn.sort((a, b) => a.r - b.r);
+
+            // gameState.tiles内の、この列のタイル（上から下）
+            const stateTilesInColumn = [];
+            gameState.tiles.forEach(tile => {
+                if (tile.q === q) {
+                    stateTilesInColumn.push(tile);
+                }
+            });
+            stateTilesInColumn.sort((a, b) => a.r - b.r);
+
+            // 対応付け（同じインデックス同士が対応）
+            for (let i = 0; i < domTilesInColumn.length && i < stateTilesInColumn.length; i++) {
+                const domTile = domTilesInColumn[i];
+                const stateTile = stateTilesInColumn[i];
+                oldToNewMap.set(domTile.el, stateTile);
+            }
+        }
+
+        // すべてのタイルにアニメーションクラスを追加し、新しい位置を設定
+        oldToNewMap.forEach((newTile, el) => {
+            el.classList.add('animating');
+            const pos = hexToPixel(newTile.q, newTile.r);
+            el.style.left = `${pos.x + 100}px`;
+            el.style.top = `${pos.y + 50}px`;
+            // dataset も更新
+            el.dataset.q = newTile.q;
+            el.dataset.r = newTile.r;
+        });
+
+        // アニメーション完了を待つ
+        setTimeout(() => {
+            // アニメーションクラスを削除
+            board.querySelectorAll('.hex-tile').forEach(el => {
+                el.classList.remove('animating');
+            });
+            resolve();
+        }, durations.slide);
+    });
 }
 
 // ===== ゲームロジック =====
@@ -163,6 +312,8 @@ function findGroup(startQ, startR) {
 
 // タイルのハイライト
 function handleTileHover(q, r) {
+    if (gameState.isAnimating) return;
+
     clearHighlight();
 
     const group = findGroup(q, r);
@@ -182,28 +333,38 @@ function clearHighlight() {
     });
 }
 
-// タイルクリック処理
-function handleTileClick(q, r) {
-    if (gameState.gameOver) return;
+// タイルクリック処理（非同期版）
+async function handleTileClick(q, r) {
+    if (gameState.gameOver || gameState.isAnimating) return;
 
     const group = findGroup(q, r);
     if (group.length < 2) return; // 2個未満は消せない
 
-    // タイルを消去
-    group.forEach(tile => {
-        gameState.tiles.delete(coordKey(tile.q, tile.r));
-    });
+    // アニメーション開始
+    gameState.isAnimating = true;
+    clearHighlight();
 
     // スコア計算: (n - 2)²
     const points = Math.pow(group.length - 2, 2);
     gameState.score += points;
+    updateScore();
 
-    // 重力処理
+    // 1. タイル削除アニメーション
+    await animateTileRemoval(group);
+
+    // 2. ゲーム状態からタイルを削除
+    group.forEach(tile => {
+        gameState.tiles.delete(coordKey(tile.q, tile.r));
+    });
+
+    // 3. 重力処理（座標を計算）
     applyGravity();
 
-    // 再描画
-    renderGrid();
-    updateScore();
+    // 4. スライドアニメーション
+    await animateTileSlide();
+
+    // アニメーション終了
+    gameState.isAnimating = false;
 
     // ゲーム終了判定
     checkGameOver();
@@ -266,14 +427,27 @@ function showGameOver() {
     document.getElementById('game-over-overlay').classList.remove('hidden');
 }
 
+// アニメーション速度を変更
+function changeAnimationSpeed(speed) {
+    gameState.animationSpeed = speed;
+    const board = document.getElementById('game-board');
+
+    // 既存の速度クラスを削除
+    board.classList.remove('speed-super-fast', 'speed-fast', 'speed-normal');
+
+    // 新しい速度クラスを追加
+    board.classList.add(`speed-${speed}`);
+}
+
 // ===== ゲーム初期化 =====
 
 function newGame() {
     gameState.score = 0;
     gameState.gameOver = false;
+    gameState.isAnimating = false;
 
     initGrid();
-    renderGrid();
+    renderGridFull();
     updateScore();
 
     document.getElementById('game-over-overlay').classList.add('hidden');
@@ -282,8 +456,18 @@ function newGame() {
 // ===== 初期化 =====
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ボタンイベント
     document.getElementById('new-game-btn').addEventListener('click', newGame);
     document.getElementById('restart-btn').addEventListener('click', newGame);
+
+    // アニメーション速度変更
+    const speedSelect = document.getElementById('animation-speed');
+    speedSelect.addEventListener('change', (e) => {
+        changeAnimationSpeed(e.target.value);
+    });
+
+    // 初期速度を設定
+    changeAnimationSpeed(gameState.animationSpeed);
 
     // 最初のゲームを開始
     newGame();
