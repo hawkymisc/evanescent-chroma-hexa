@@ -14,24 +14,21 @@ let gameState = {
 
 // ===== 六角形座標ユーティリティ =====
 
-// Axial座標からピクセル座標への変換（Pointy-top方式）
+// Offset座標からピクセル座標への変換（Pointy-top、even-r方式）
 function hexToPixel(q, r) {
     // CSS六角形の寸法
     const hexWidth = 60;   // 横幅
     const hexHeight = 70;  // 高さ
 
-    // 六角形の頂点（中心基準）：
-    // 上: (0, -35), 右上: (30, -17.5), 右下: (30, 17.5)
-    // 下: (0, 35), 左下: (-30, 17.5), 左上: (-30, -17.5)
+    // 六角形の一辺の長さ（右の垂直辺の長さ）
+    const edgeLength = 35; // (52.5 - 17.5) = 35px
+    const size = edgeLength;
 
-    // 隣接六角形が辺で接触するための中心間距離：
-    // 東方向 (dq=+1, dr=0): x方向に +60
-    // 南方向 (dq=0, dr=+1): y方向に +35
-    // 北東方向 (dq=+1, dr=-1): (+60, -35)
-
-    // Axial座標系の変換式
-    const x = hexWidth * q;
-    const y = (hexHeight / 2) * (r - q);
+    // Offset座標系（even-r）からピクセル座標への変換
+    // 奇数行は横方向に size * √3 / 2 だけオフセット
+    // これにより、n行目とn+2行目のx座標が一致する
+    const x = size * Math.sqrt(3) * (q + 0.5 * (r % 2));
+    const y = size * 1.5 * r;
 
     return { x, y };
 }
@@ -41,19 +38,30 @@ function coordKey(q, r) {
     return `${q},${r}`;
 }
 
-// 6方向の隣接オフセット（Axial座標系）
-const NEIGHBOR_OFFSETS = [
+// 6方向の隣接オフセット（Offset座標系 even-r方式）
+// 偶数行と奇数行で異なるオフセットを使用
+const NEIGHBOR_OFFSETS_EVEN = [
     { dq: +1, dr: 0 },  // 右
-    { dq: +1, dr: -1 }, // 右上
-    { dq: 0, dr: -1 },  // 左上
+    { dq: 0, dr: -1 },  // 右上
+    { dq: -1, dr: -1 }, // 左上
     { dq: -1, dr: 0 },  // 左
     { dq: -1, dr: +1 }, // 左下
     { dq: 0, dr: +1 }   // 右下
 ];
 
+const NEIGHBOR_OFFSETS_ODD = [
+    { dq: +1, dr: 0 },  // 右
+    { dq: +1, dr: -1 }, // 右上
+    { dq: 0, dr: -1 },  // 左上
+    { dq: -1, dr: 0 },  // 左
+    { dq: 0, dr: +1 },  // 左下
+    { dq: +1, dr: +1 }  // 右下
+];
+
 // 隣接タイルの座標を取得
 function getNeighbors(q, r) {
-    return NEIGHBOR_OFFSETS.map(offset => ({
+    const offsets = (r % 2 === 0) ? NEIGHBOR_OFFSETS_EVEN : NEIGHBOR_OFFSETS_ODD;
+    return offsets.map(offset => ({
         q: q + offset.dq,
         r: r + offset.dr
     }));
