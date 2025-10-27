@@ -6,10 +6,11 @@ const GRID_ROWS = 9;
 const NUM_COLORS = 4;
 
 // アニメーション速度設定（ミリ秒）
+// 削除とスライドは順番に実行されるため、合計時間が体感速度になる
 const ANIMATION_SPEEDS = {
-    'super-fast': { remove: 150, slide: 200 },
-    'fast': { remove: 200, slide: 300 },
-    'normal': { remove: 300, slide: 400 }
+    'super-fast': { remove: 40, slide: 60 },   // 合計 0.1秒
+    'fast': { remove: 120, slide: 180 },       // 合計 0.3秒
+    'normal': { remove: 200, slide: 300 }      // 合計 0.5秒
 };
 
 // ===== ゲーム状態 =====
