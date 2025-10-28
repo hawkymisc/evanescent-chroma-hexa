@@ -116,6 +116,7 @@ See [TEST_DESIGN.md](TEST_DESIGN.md) for details.
 - [REQUIREMENTS.md](REQUIREMENTS.md) - MVP requirements
 - [SPEC.md](SPEC.md) - Detailed specifications
 - [TEST_DESIGN.md](TEST_DESIGN.md) - Test design document
+- [ROADMAP.md](ROADMAP.md) - Development roadmap and future plans
 
 ### 🎨 Color Palette
 
@@ -248,6 +249,7 @@ python -m http.server 8000
 - [REQUIREMENTS.md](REQUIREMENTS.md) - MVP要件定義
 - [SPEC.md](SPEC.md) - 詳細仕様書
 - [TEST_DESIGN.md](TEST_DESIGN.md) - テスト設計書
+- [ROADMAP.md](ROADMAP.md) - 開発ロードマップと今後の計画
 
 ### 🎨 カラーパレット
 
