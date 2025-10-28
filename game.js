@@ -103,15 +103,35 @@ function updateHighScoreDisplay() {
 
 // ===== 六角形座標ユーティリティ =====
 
+// 画面サイズに応じたスケーリング係数を計算
+function calculateScale() {
+    const board = document.getElementById('game-board');
+    if (!board) return 1;
+
+    const boardWidth = board.clientWidth;
+    const boardHeight = board.clientHeight;
+
+    // 基準サイズ（デザイン時のサイズ）
+    const baseWidth = 700;
+    const baseHeight = 600;
+
+    // スケール係数（小さい方を採用）
+    const scaleX = boardWidth / baseWidth;
+    const scaleY = boardHeight / baseHeight;
+    const scale = Math.min(scaleX, scaleY, 1); // 1を超えないように
+
+    return scale;
+}
+
 // Offset座標からピクセル座標への変換（Pointy-top、even-r方式）
-function hexToPixel(q, r) {
+function hexToPixel(q, r, scale = 1) {
     // CSS六角形の寸法
     const hexWidth = 60;   // 横幅
     const hexHeight = 70;  // 高さ
 
     // 六角形の一辺の長さ（右の垂直辺の長さ）
     const edgeLength = 35; // (52.5 - 17.5) = 35px
-    const size = edgeLength;
+    const size = edgeLength * scale;
 
     // Offset座標系（even-r）からピクセル座標への変換
     // 奇数行は横方向に size * √3 / 2 だけオフセット
@@ -185,15 +205,24 @@ function initGrid() {
 
 // タイルのDOM要素を作成
 function createTileElement(tile) {
+    const scale = calculateScale();
     const hexEl = document.createElement('div');
     hexEl.className = `hex-tile color-${tile.color}`;
     hexEl.dataset.q = tile.q;
     hexEl.dataset.r = tile.r;
 
+    // スケールに応じたサイズ設定
+    const scaledWidth = 60.62 * scale;
+    const scaledHeight = 70 * scale;
+    hexEl.style.width = `${scaledWidth}px`;
+    hexEl.style.height = `${scaledHeight}px`;
+
     // 位置を計算（中央寄せのためオフセット追加）
-    const pos = hexToPixel(tile.q, tile.r);
-    hexEl.style.left = `${pos.x + 100}px`;
-    hexEl.style.top = `${pos.y + 50}px`;
+    const pos = hexToPixel(tile.q, tile.r, scale);
+    const offsetX = 100 * scale;
+    const offsetY = 50 * scale;
+    hexEl.style.left = `${pos.x + offsetX}px`;
+    hexEl.style.top = `${pos.y + offsetY}px`;
 
     // イベントリスナー
     hexEl.addEventListener('click', () => handleTileClick(tile.q, tile.r));
@@ -206,6 +235,7 @@ function createTileElement(tile) {
 // グリッドを描画（差分更新版）
 function renderGrid() {
     const board = document.getElementById('game-board');
+    const scale = calculateScale();
 
     // 既存のタイルをマップに保存
     const existingTiles = new Map();
@@ -224,10 +254,17 @@ function renderGrid() {
             hexEl = createTileElement(tile);
             board.appendChild(hexEl);
         } else {
-            // 既存のタイルの位置を更新（色が変わる可能性もあるが、このゲームでは変わらない）
-            const pos = hexToPixel(tile.q, tile.r);
-            hexEl.style.left = `${pos.x + 100}px`;
-            hexEl.style.top = `${pos.y + 50}px`;
+            // 既存のタイルの位置とサイズを更新
+            const scaledWidth = 60.62 * scale;
+            const scaledHeight = 70 * scale;
+            hexEl.style.width = `${scaledWidth}px`;
+            hexEl.style.height = `${scaledHeight}px`;
+
+            const pos = hexToPixel(tile.q, tile.r, scale);
+            const offsetX = 100 * scale;
+            const offsetY = 50 * scale;
+            hexEl.style.left = `${pos.x + offsetX}px`;
+            hexEl.style.top = `${pos.y + offsetY}px`;
             // 使用済みとしてマークするため削除
             existingTiles.delete(key);
         }
@@ -294,6 +331,7 @@ function animateTileRemoval(tiles) {
 function animateTileSlide() {
     const durations = getAnimationDurations();
     const board = document.getElementById('game-board');
+    const scale = calculateScale();
 
     return new Promise(resolve => {
         // DOM要素を古い座標から新しい座標にマッピング
@@ -334,9 +372,11 @@ function animateTileSlide() {
         // すべてのタイルにアニメーションクラスを追加し、新しい位置を設定
         oldToNewMap.forEach((newTile, el) => {
             el.classList.add('animating');
-            const pos = hexToPixel(newTile.q, newTile.r);
-            el.style.left = `${pos.x + 100}px`;
-            el.style.top = `${pos.y + 50}px`;
+            const pos = hexToPixel(newTile.q, newTile.r, scale);
+            const offsetX = 100 * scale;
+            const offsetY = 50 * scale;
+            el.style.left = `${pos.x + offsetX}px`;
+            el.style.top = `${pos.y + offsetY}px`;
             // dataset も更新
             el.dataset.q = newTile.q;
             el.dataset.r = newTile.r;
@@ -564,6 +604,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const speedSelect = document.getElementById('animation-speed');
     speedSelect.addEventListener('change', (e) => {
         changeAnimationSpeed(e.target.value);
+    });
+
+    // ウィンドウリサイズ時にタイルの位置とサイズを再計算
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        // デバウンス処理（リサイズイベントが連続して発生するのを防ぐ）
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (!gameState.isAnimating) {
+                renderGrid();
+            }
+        }, 100);
     });
 
     // 初期速度を設定
