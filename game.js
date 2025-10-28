@@ -22,6 +22,85 @@ let gameState = {
     animationSpeed: 'normal' // デフォルトの速度
 };
 
+// ハイスコア情報
+let highScore = {
+    score: 0,
+    date: null
+};
+
+// ===== Cookie管理 =====
+
+// Cookieに値を保存（事実上無期限）
+function setCookie(name, value) {
+    // 10年後の日付（事実上無期限）
+    const date = new Date();
+    date.setTime(date.getTime() + (10 * 365 * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/";
+}
+
+// Cookieから値を取得
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1);
+        if (c.indexOf(nameEQ) === 0) {
+            return decodeURIComponent(c.substring(nameEQ.length));
+        }
+    }
+    return null;
+}
+
+// ハイスコアをCookieから読み込む
+function loadHighScore() {
+    const scoreStr = getCookie('highScore');
+    const dateStr = getCookie('highScoreDate');
+
+    if (scoreStr) {
+        highScore.score = parseInt(scoreStr, 10) || 0;
+    }
+    if (dateStr) {
+        highScore.date = dateStr;
+    }
+
+    updateHighScoreDisplay();
+}
+
+// ハイスコアをCookieに保存
+function saveHighScore(score) {
+    const now = new Date();
+    const dateStr = now.toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    highScore.score = score;
+    highScore.date = dateStr;
+
+    setCookie('highScore', score.toString());
+    setCookie('highScoreDate', dateStr);
+
+    updateHighScoreDisplay();
+}
+
+// ハイスコア表示を更新
+function updateHighScoreDisplay() {
+    const highScoreElement = document.getElementById('high-score');
+    const highScoreDateElement = document.getElementById('high-score-date');
+
+    if (highScoreElement) {
+        highScoreElement.textContent = highScore.score;
+    }
+    if (highScoreDateElement && highScore.date) {
+        highScoreDateElement.textContent = `(${highScore.date})`;
+    }
+}
+
 // ===== 六角形座標ユーティリティ =====
 
 // Offset座標からピクセル座標への変換（Pointy-top、even-r方式）
@@ -425,6 +504,23 @@ function checkGameOver() {
 // ゲーム終了画面を表示
 function showGameOver() {
     document.getElementById('final-score').textContent = gameState.score;
+
+    // ハイスコアチェック
+    if (gameState.score > highScore.score) {
+        saveHighScore(gameState.score);
+        // 新記録メッセージを表示
+        const newRecordMsg = document.getElementById('new-record-message');
+        if (newRecordMsg) {
+            newRecordMsg.classList.remove('hidden');
+        }
+    } else {
+        // 新記録メッセージを非表示
+        const newRecordMsg = document.getElementById('new-record-message');
+        if (newRecordMsg) {
+            newRecordMsg.classList.add('hidden');
+        }
+    }
+
     document.getElementById('game-over-overlay').classList.remove('hidden');
 }
 
@@ -457,6 +553,9 @@ function newGame() {
 // ===== 初期化 =====
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ハイスコアを読み込む
+    loadHighScore();
+
     // ボタンイベント
     document.getElementById('new-game-btn').addEventListener('click', newGame);
     document.getElementById('restart-btn').addEventListener('click', newGame);
