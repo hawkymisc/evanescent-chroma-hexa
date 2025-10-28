@@ -51,6 +51,18 @@ h1 {
     color: #333;
 }
 
+.high-score-display {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.high-score-date {
+    font-size: 0.7em;
+    color: #888;
+    font-weight: normal;
+}
+
 .speed-control {
     display: flex;
     align-items: center;
@@ -313,4 +325,22 @@ h1 {
         width: 98vw;
         height: 55vh;
     }
+.new-record {
+    color: #FFD700;
+    font-size: 1.8em;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.hidden {
+    display: none;
 }

@@ -16,6 +16,9 @@
             <div class="score-display">
                 スコア: <span id="score">0</span>
             </div>
+            <div class="high-score-display">
+                ハイスコア: <span id="high-score">0</span> <span id="high-score-date" class="high-score-date"></span>
+            </div>
             <div class="speed-control">
                 <label>アニメーション速度:</label>
                 <select id="animation-speed">
@@ -38,6 +41,7 @@
             <div class="game-over-message">
                 <h2>ゲーム終了</h2>
                 <p>最終スコア: <span id="final-score">0</span></p>
+                <p id="new-record-message" class="new-record hidden">🎉 新記録です！ 🎉</p>
                 <button id="restart-btn" class="btn">もう一度プレイ</button>
             </div>
         </div>
