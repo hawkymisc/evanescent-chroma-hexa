@@ -123,6 +123,41 @@ function calculateScale() {
     return scale;
 }
 
+// グリッド全体のサイズとオフセットを計算
+function calculateGridLayout() {
+    const scale = calculateScale();
+    const board = document.getElementById('game-board');
+
+    if (!board) {
+        return {
+            scale: 1,
+            offsetX: 100,
+            offsetY: 50
+        };
+    }
+
+    const boardWidth = board.clientWidth;
+    const boardHeight = board.clientHeight;
+
+    // 六角形のサイズ
+    const edgeLength = 35 * scale;
+    const size = edgeLength;
+
+    // グリッド全体のサイズを計算
+    const gridWidth = size * Math.sqrt(3) * (GRID_COLS + 0.5);
+    const gridHeight = size * 1.5 * (GRID_ROWS - 1) + size * 2;
+
+    // 中央配置のためのオフセットを計算
+    const offsetX = Math.max(0, (boardWidth - gridWidth) / 2);
+    const offsetY = Math.max(0, (boardHeight - gridHeight) / 2);
+
+    return {
+        scale: scale,
+        offsetX: offsetX,
+        offsetY: offsetY
+    };
+}
+
 // Offset座標からピクセル座標への変換（Pointy-top、even-r方式）
 function hexToPixel(q, r, scale = 1) {
     // CSS六角形の寸法
@@ -205,24 +240,22 @@ function initGrid() {
 
 // タイルのDOM要素を作成
 function createTileElement(tile) {
-    const scale = calculateScale();
+    const layout = calculateGridLayout();
     const hexEl = document.createElement('div');
     hexEl.className = `hex-tile color-${tile.color}`;
     hexEl.dataset.q = tile.q;
     hexEl.dataset.r = tile.r;
 
     // スケールに応じたサイズ設定
-    const scaledWidth = 60.62 * scale;
-    const scaledHeight = 70 * scale;
+    const scaledWidth = 60.62 * layout.scale;
+    const scaledHeight = 70 * layout.scale;
     hexEl.style.width = `${scaledWidth}px`;
     hexEl.style.height = `${scaledHeight}px`;
 
     // 位置を計算（中央寄せのためオフセット追加）
-    const pos = hexToPixel(tile.q, tile.r, scale);
-    const offsetX = 100 * scale;
-    const offsetY = 50 * scale;
-    hexEl.style.left = `${pos.x + offsetX}px`;
-    hexEl.style.top = `${pos.y + offsetY}px`;
+    const pos = hexToPixel(tile.q, tile.r, layout.scale);
+    hexEl.style.left = `${pos.x + layout.offsetX}px`;
+    hexEl.style.top = `${pos.y + layout.offsetY}px`;
 
     // イベントリスナー
     hexEl.addEventListener('click', () => handleTileClick(tile.q, tile.r));
@@ -235,7 +268,7 @@ function createTileElement(tile) {
 // グリッドを描画（差分更新版）
 function renderGrid() {
     const board = document.getElementById('game-board');
-    const scale = calculateScale();
+    const layout = calculateGridLayout();
 
     // 既存のタイルをマップに保存
     const existingTiles = new Map();
@@ -255,16 +288,14 @@ function renderGrid() {
             board.appendChild(hexEl);
         } else {
             // 既存のタイルの位置とサイズを更新
-            const scaledWidth = 60.62 * scale;
-            const scaledHeight = 70 * scale;
+            const scaledWidth = 60.62 * layout.scale;
+            const scaledHeight = 70 * layout.scale;
             hexEl.style.width = `${scaledWidth}px`;
             hexEl.style.height = `${scaledHeight}px`;
 
-            const pos = hexToPixel(tile.q, tile.r, scale);
-            const offsetX = 100 * scale;
-            const offsetY = 50 * scale;
-            hexEl.style.left = `${pos.x + offsetX}px`;
-            hexEl.style.top = `${pos.y + offsetY}px`;
+            const pos = hexToPixel(tile.q, tile.r, layout.scale);
+            hexEl.style.left = `${pos.x + layout.offsetX}px`;
+            hexEl.style.top = `${pos.y + layout.offsetY}px`;
             // 使用済みとしてマークするため削除
             existingTiles.delete(key);
         }
@@ -331,7 +362,7 @@ function animateTileRemoval(tiles) {
 function animateTileSlide() {
     const durations = getAnimationDurations();
     const board = document.getElementById('game-board');
-    const scale = calculateScale();
+    const layout = calculateGridLayout();
 
     return new Promise(resolve => {
         // DOM要素を古い座標から新しい座標にマッピング
@@ -372,11 +403,9 @@ function animateTileSlide() {
         // すべてのタイルにアニメーションクラスを追加し、新しい位置を設定
         oldToNewMap.forEach((newTile, el) => {
             el.classList.add('animating');
-            const pos = hexToPixel(newTile.q, newTile.r, scale);
-            const offsetX = 100 * scale;
-            const offsetY = 50 * scale;
-            el.style.left = `${pos.x + offsetX}px`;
-            el.style.top = `${pos.y + offsetY}px`;
+            const pos = hexToPixel(newTile.q, newTile.r, layout.scale);
+            el.style.left = `${pos.x + layout.offsetX}px`;
+            el.style.top = `${pos.y + layout.offsetY}px`;
             // dataset も更新
             el.dataset.q = newTile.q;
             el.dataset.r = newTile.r;
