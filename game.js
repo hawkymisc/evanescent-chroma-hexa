@@ -119,16 +119,45 @@ function calculateScale() {
     const boardWidth = board.clientWidth;
     const boardHeight = board.clientHeight;
 
-    // 基準サイズ（デザイン時のサイズ）
-    const baseWidth = 700;
-    const baseHeight = 600;
+    // 六角形の基準サイズ
+    const baseEdgeLength = 35;
 
-    // スケール係数（小さい方を採用）
-    const scaleX = boardWidth / baseWidth;
-    const scaleY = boardHeight / baseHeight;
+    // グリッド全体のサイズを計算（スケール1の場合）
+    const gridWidth = baseEdgeLength * Math.sqrt(3) * (GRID_COLS + 0.5);
+    const gridHeight = baseEdgeLength * 1.5 * GRID_ROWS + baseEdgeLength * 0.5;
+
+    // マージンを考慮
+    const margin = 100; // 左右上下のマージン
+
+    // スケール係数を計算（グリッドがボード内に収まるように）
+    const scaleX = (boardWidth - margin) / gridWidth;
+    const scaleY = (boardHeight - margin) / gridHeight;
     const scale = Math.min(scaleX, scaleY, 1); // 1を超えないように
 
     return scale;
+}
+
+// グリッドを中央に配置するためのオフセットを計算
+function calculateOffset(scale) {
+    const board = document.getElementById('game-board');
+    if (!board) return { x: 0, y: 0 };
+
+    const boardWidth = board.clientWidth;
+    const boardHeight = board.clientHeight;
+
+    // 六角形の基準サイズ
+    const baseEdgeLength = 35;
+    const size = baseEdgeLength * scale;
+
+    // グリッド全体のサイズを計算
+    const gridWidth = size * Math.sqrt(3) * (GRID_COLS + 0.5);
+    const gridHeight = size * 1.5 * GRID_ROWS + size * 0.5;
+
+    // 中央配置のためのオフセット
+    const offsetX = (boardWidth - gridWidth) / 2;
+    const offsetY = (boardHeight - gridHeight) / 2;
+
+    return { x: offsetX, y: offsetY };
 }
 
 // Offset座標からピクセル座標への変換（Pointy-top、even-r方式）
@@ -227,10 +256,9 @@ function createTileElement(tile) {
 
     // 位置を計算（中央寄せのためオフセット追加）
     const pos = hexToPixel(tile.q, tile.r, scale);
-    const offsetX = 100 * scale;
-    const offsetY = 50 * scale;
-    hexEl.style.left = `${pos.x + offsetX}px`;
-    hexEl.style.top = `${pos.y + offsetY}px`;
+    const offset = calculateOffset(scale);
+    hexEl.style.left = `${pos.x + offset.x}px`;
+    hexEl.style.top = `${pos.y + offset.y}px`;
 
     // イベントリスナー
     hexEl.addEventListener('click', () => handleTileClick(tile.q, tile.r));
@@ -244,6 +272,7 @@ function createTileElement(tile) {
 function renderGrid() {
     const board = document.getElementById('game-board');
     const scale = calculateScale();
+    const offset = calculateOffset(scale);
 
     // 既存のタイルをマップに保存
     const existingTiles = new Map();
@@ -269,10 +298,8 @@ function renderGrid() {
             hexEl.style.height = `${scaledHeight}px`;
 
             const pos = hexToPixel(tile.q, tile.r, scale);
-            const offsetX = 100 * scale;
-            const offsetY = 50 * scale;
-            hexEl.style.left = `${pos.x + offsetX}px`;
-            hexEl.style.top = `${pos.y + offsetY}px`;
+            hexEl.style.left = `${pos.x + offset.x}px`;
+            hexEl.style.top = `${pos.y + offset.y}px`;
             // 使用済みとしてマークするため削除
             existingTiles.delete(key);
         }
@@ -340,6 +367,7 @@ function animateTileSlide() {
     const durations = getAnimationDurations();
     const board = document.getElementById('game-board');
     const scale = calculateScale();
+    const offset = calculateOffset(scale);
 
     return new Promise(resolve => {
         // DOM要素を古い座標から新しい座標にマッピング
@@ -381,10 +409,8 @@ function animateTileSlide() {
         oldToNewMap.forEach((newTile, el) => {
             el.classList.add('animating');
             const pos = hexToPixel(newTile.q, newTile.r, scale);
-            const offsetX = 100 * scale;
-            const offsetY = 50 * scale;
-            el.style.left = `${pos.x + offsetX}px`;
-            el.style.top = `${pos.y + offsetY}px`;
+            el.style.left = `${pos.x + offset.x}px`;
+            el.style.top = `${pos.y + offset.y}px`;
             // dataset も更新
             el.dataset.q = newTile.q;
             el.dataset.r = newTile.r;
