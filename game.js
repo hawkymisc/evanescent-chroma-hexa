@@ -1,9 +1,17 @@
 // 六角形パズルゲーム - ゲームロジック
 
 // ===== 定数 =====
-const GRID_COLS = 8;
-const GRID_ROWS = 9;
+let GRID_COLS = 8;
+let GRID_ROWS = 9;
 const NUM_COLORS = 4;
+
+// タイル数プリセット
+const TILE_COUNT_PRESETS = {
+    'small': { cols: 6, rows: 7 },
+    'medium': { cols: 8, rows: 9 },
+    'large': { cols: 10, rows: 11 },
+    'xlarge': { cols: 12, rows: 13 }
+};
 
 // アニメーション速度設定（ミリ秒）
 // 削除とスライドは順番に実行されるため、合計時間が体感速度になる
@@ -576,6 +584,18 @@ function changeAnimationSpeed(speed) {
     board.classList.add(`speed-${speed}`);
 }
 
+// タイル数を変更
+function changeTileCount(preset) {
+    if (!TILE_COUNT_PRESETS[preset]) return;
+
+    const config = TILE_COUNT_PRESETS[preset];
+    GRID_COLS = config.cols;
+    GRID_ROWS = config.rows;
+
+    // ゲームをリセット
+    newGame();
+}
+
 // ===== ゲーム初期化 =====
 
 function newGame() {
@@ -604,6 +624,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const speedSelect = document.getElementById('animation-speed');
     speedSelect.addEventListener('change', (e) => {
         changeAnimationSpeed(e.target.value);
+    });
+
+    // タイル数変更
+    const tileCountSelect = document.getElementById('tile-count');
+    tileCountSelect.addEventListener('change', (e) => {
+        changeTileCount(e.target.value);
     });
 
     // ウィンドウリサイズ時にタイルの位置とサイズを再計算
