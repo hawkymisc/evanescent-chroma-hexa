@@ -63,6 +63,7 @@ h1 {
     font-weight: normal;
 }
 
+.tile-count-control,
 .speed-control {
     display: flex;
     align-items: center;
@@ -71,10 +72,12 @@ h1 {
     color: #333;
 }
 
+.tile-count-control label,
 .speed-control label {
     font-weight: bold;
 }
 
+.tile-count-control select,
 .speed-control select {
     padding: 8px 12px;
     border: 2px solid #667eea;
@@ -85,10 +88,12 @@ h1 {
     transition: border-color 0.3s;
 }
 
+.tile-count-control select:hover,
 .speed-control select:hover {
     border-color: #5568d3;
 }
 
+.tile-count-control select:focus,
 .speed-control select:focus {
     outline: none;
     border-color: #5568d3;
@@ -279,10 +284,12 @@ h1 {
         font-size: 1.2em;
     }
 
+    .tile-count-control,
     .speed-control {
         font-size: 0.9em;
     }
 
+    .tile-count-control select,
     .speed-control select {
         padding: 6px 10px;
         font-size: 0.9em;
